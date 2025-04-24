@@ -1,8 +1,11 @@
+"use client";
 import { combineReducers } from "redux";
 import { persistReducer } from "redux-persist";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 // slices
 import dashboardReducer from "./slices/dashboard";
+import projectReducer from "./slices/project";
+import partReducer from "./slices/part";
 
 // ----------------------------------------------------------------------
 
@@ -39,6 +42,8 @@ const productPersistConfig = {
 
 const rootReducer = combineReducers({
   dashboard: dashboardReducer,
+  project: projectReducer,
+  partData: partReducer,
 });
 
 export { rootPersistConfig, rootReducer };

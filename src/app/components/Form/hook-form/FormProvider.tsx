@@ -1,23 +1,24 @@
-import { FormProvider as Form, UseFormReturn } from 'react-hook-form'
+"use client"
+import { FormProvider, UseFormReturn } from 'react-hook-form'
 
 type Props = {
   children: React.ReactNode
   methods: UseFormReturn<any>
-  onSubmit?: VoidFunction
+  onSubmit?: (e?: React.BaseSyntheticEvent) => void
   className?: string
 }
 
-export default function FormProvider({
+export default function FormWrapper({
   children,
   onSubmit,
   methods,
   className,
 }: Props) {
   return (
-    <Form {...methods}>
+    <FormProvider {...methods}>
       <form className={className} onSubmit={onSubmit}>
         {children}
       </form>
-    </Form>
+    </FormProvider>
   )
 }

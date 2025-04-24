@@ -39,19 +39,24 @@ const Dashboard = ({
       </div>
       <div className="flex flex-col justify-between">
         <div className="bg-[#F00B0F] flex flex-col items-center px-5 py-10 rounded-lg gap-5">
-          <div className="text-white font-bold text-6xl">ON HOLD</div>
-          <div className="text-white font-bold text-9xl">{onHold}</div>
+          <div className="text-white font-bold text-6xl">{onHold.name}</div>
+          <div className="text-white font-bold text-9xl">{onHold.value}</div>
         </div>
         <div className="pt-3 flex flex-col gap-3">
           {tagLines.map((tagLine, idx) => (
-            <TagLine key={idx} title={tagLine.title} value={tagLine.value} />
+            <TagLine key={idx} name={tagLine.name} value={tagLine.value} />
           ))}
         </div>
       </div>
       <div className="flex flex-col justify-end">
         <div className="text-white">
           {/* {progress.toFixed(0)}% */}
-          <CircularProgress variant="determinate" value={progress} color="error" size="80px"/>
+          <CircularProgress
+            variant="determinate"
+            value={progress}
+            color="error"
+            size="80px"
+          />
         </div>
       </div>
     </div>

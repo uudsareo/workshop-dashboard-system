@@ -1,5 +1,5 @@
 "use client";
-import { useSelector } from "@/redux/store";
+import { dispatch, useSelector } from "@/redux/store";
 import React, { useEffect, useState } from "react";
 import { set, useForm } from "react-hook-form";
 import { Dashboard } from "../components/DashboardTile";
@@ -20,69 +20,81 @@ import {
   Square2StackIcon,
   TrashIcon,
 } from "@heroicons/react/16/solid";
-import { dashboard, DashboardTile } from "../constants/dashboard";
+import { DashboardTile } from "../constants/dashboard";
+import { getAllPart } from "@/redux/slices/dashboard";
+import { PartData } from "@/interfaces/part";
 
 const index = () => {
-  const [count, setCount] = useState<number>(1);
-  const [current, setCurrent] = useState<typeof dashboard>([dashboard[0]]);
-  const [page, setPage] = useState<number>(1);
-  const [totalCount, setTotalCount] = useState<number>(dashboard.length);
-  const [isShowing, setIsShowing] = useState(true);
+  const { partData } = useSelector((state) => state.dashboard);
 
+  const [count, setCount] = useState<number>(1);
+  const [current, setCurrent] = useState<PartData[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [totalCount, setTotalCount] = useState<number>(partData.length);
+  const [isShowing, setIsShowing] = useState(true);
+  console.log(current);
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    setCurrent(dashboard.slice(0, Math.max(0, count)));
-  }, [count]);
+  // useEffect(() => {
+  //   dispatch(getAllPart());
+  // });
 
+  useEffect(() => {
+    dispatch(getAllPart());
+  }, []);
+
+  useEffect(() => {
+    setCurrent(partData.slice(0, Math.max(0, count)));
+  }, [count, partData]);
+
+  // useEffect(() => {
+  //   setCurrent(partData.slice(0, Math.max(0, count)));
+  // }, [count]);
 
   const secDelay = 2500;
 
+  // useEffect(() => {
+  //   if (secDelay > 0) {
+  //     setProgress(0);
 
+  //     const increment = 100 / (secDelay / 100);
+  //     const timer = setInterval(() => {
+  //       setProgress((prevProgress) => {
+  //         const nextProgress = prevProgress + increment;
+  //         if (nextProgress >= 100) {
+  //           clearInterval(timer);
+  //           return 100;
+  //         }
+  //         return nextProgress;
+  //       });
+  //     }, 100);
 
-  useEffect(() => {
-    if (secDelay > 0) {
-      setProgress(0);
-  
-      const increment = 100 / (secDelay / 100); 
-      const timer = setInterval(() => {
-        setProgress((prevProgress) => {
-          const nextProgress = prevProgress + increment;
-          if (nextProgress >= 100) {
-            clearInterval(timer); 
-            return 100;
-          }
-          return nextProgress;
-        });
-      }, 100);
-  
-      return () => clearInterval(timer);
-    }
-  }, [secDelay, current]);
-  
+  //     return () => clearInterval(timer);
+  //   }
+  // }, [secDelay, current]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPage((prevPage) => {
-        const nextPage = prevPage + 1;
-        const startIndex = (nextPage - 1) * count;
-        const endIndex = startIndex + count;
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setPage((prevPage) => {
+  //       const nextPage = prevPage + 1;
+  //       const startIndex = (nextPage - 1) * count;
+  //       const endIndex = startIndex + count;
 
-        if (startIndex >= dashboard.length) {
-          setPage(1);
-          setCurrent(dashboard.slice(0, count));
-          return 1;
-        }
-        setCurrent(dashboard.slice(startIndex, endIndex));
-        return nextPage;
-      });
-    }, secDelay);
-    setTotalCount(dashboard.length);
-    return () => clearInterval(interval);
-  }, [count]);
+  //       if (startIndex >= partData.length) {
+  //         setPage(1);
+  //         setCurrent(partData.slice(0, count));
+  //         return 1;
+  //       }
+  //       setCurrent(partData.slice(startIndex, endIndex));
+  //       return nextPage;
+  //     });
+  //   }, secDelay);
+  //   setTotalCount(partData.length);
+  //   return () => clearInterval(interval);
+  // }, [count]);
 
   return (
-    <div className="flex flex-col w-full h-screen bg-gray-600">
+    <div className="flex flex-col w-full h-screen bg-gray-950">
       <div className="fixed top-1 right-0 w-52 text-right">
         <Menu>
           <MenuButton className="inline-flex items-center gap-2 rounded-md bg-gray-800 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-700 data-[open]:bg-gray-700 data-[focus]:outline-1 data-[focus]:outline-white">
@@ -112,18 +124,28 @@ const index = () => {
           </MenuItems>
         </Menu>
       </div>
-      <div className="grid grid-cols-2 gap-4 p-4">
-        {current.map((item, idx) => (
-          <Dashboard
-            key={idx}
-            imageSrc={ImageBg}
-            locations={item.locations}
-            partName={item.name}
-            tagLines={item.tagLines}
-            onHold={item.onHold}
-            progress={progress}
-          />
-        ))}
+      <div>
+        <h1 className="text-white font-bold text-5xl text-center py-5">
+          PHOENIX - 04/22/2025
+        </h1>
+      </div>
+      <div
+        className={`grid gap-4 p-4 ${
+          count === 1 ? "grid-cols-1 place-items-center" : "grid-cols-2"
+        }`}
+      >
+        {current.length > 0 &&
+          (current ?? []).map((item, idx) => (
+            <Dashboard
+              key={idx}
+              imageSrc={ImageBg}
+              locations={item.locations}
+              partName={item.name}
+              tagLines={item.tagLines}
+              onHold={item.onHold}
+              progress={progress}
+            />
+          ))}
       </div>
     </div>
   );
