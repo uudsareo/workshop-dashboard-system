@@ -44,7 +44,7 @@ export const { setProjects } = slice.actions;
 // Reducer
 export default slice.reducer;
 
-export function getAllInvesment() {
+export function getProjects() {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {

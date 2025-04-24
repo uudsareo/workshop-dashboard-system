@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import FormProvider from "@/app/components/Form/hook-form/FormProvider";
 import InputText from "@/app/components/Form/hook-form/InputText";
 import { dispatch, useSelector } from "@/redux/store";
-import { getAllInvesment } from "@/redux/slices/project";
+import { getProjects } from "@/redux/slices/project";
 import SelectDropdown from "@/app/components/Form/hook-form/InputSelect";
 import { project } from "@/interfaces/project";
 import { PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
@@ -104,13 +104,8 @@ const Insert = () => {
     } catch (error) {}
   };
 
-  console.log("data", data);
-
   useEffect(() => {
-    const fetchData = async () => {
-      await dispatch(getAllInvesment());
-    };
-    fetchData();
+    dispatch(getProjects());
   }, []);
 
   return (

@@ -21,7 +21,11 @@ export interface PartData {
   _id?: string;
   __v?: number;
   name: string;
-  projectId: string;
+  projectId: {
+    _id: string;
+    name: string;
+    description?: string;
+  };
   imagePath?: string;
   locations: Location[];
   onHold: Hold;

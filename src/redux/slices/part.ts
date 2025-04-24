@@ -9,12 +9,14 @@ const url = "/part";
 
 type InitialState = {
   data: PartData[] | null;
+  selectedPart: PartData | null;
   imageUrl: string | null;
   isLoading: boolean;
   error: any;
 };
 
 const initialState: InitialState = {
+  selectedPart: null,
   data: [],
   imageUrl: null,
   isLoading: false,
@@ -43,13 +45,18 @@ const slice = createSlice({
       state.data = action.payload;
       state.isLoading = false;
     },
+    setSelectedPart(state, action) {
+      state.selectedPart = action.payload;
+      state.isLoading = false;
+    },
     setImageUrl(state, action) {
       state.imageUrl = action.payload;
     },
   },
 });
 
-export const { setProjects, setImageUrl, setPart } = slice.actions;
+export const { setProjects, setImageUrl, setPart, setSelectedPart } =
+  slice.actions;
 
 // Reducer
 export default slice.reducer;
@@ -78,12 +85,36 @@ export function insertPart(file: File, data: any) {
   };
 }
 
-export function getAllPart() {
+export function getPartList() {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
       const res = await Axios.get(`${url}`);
-      dispatch(setPart(res.data));
+      dispatch(setPart(res.data.data));
+    } catch (error) {
+      dispatch(slice.actions.hasError(error));
+    }
+  };
+}
+
+export function getPartById(id: string) {
+  return async () => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const res = await Axios.get(`${url}/${id}`);
+      dispatch(setSelectedPart(res.data));
+    } catch (error) {
+      dispatch(slice.actions.hasError(error));
+    }
+  };
+}
+
+export function updatePart(id: string, data: any) {
+  return async () => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const res = await Axios.put(`${url}/${id}`, data);
+      dispatch(setSelectedPart(res.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }

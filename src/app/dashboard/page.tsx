@@ -23,6 +23,7 @@ import {
 import { DashboardTile } from "../constants/dashboard";
 import { getAllPart } from "@/redux/slices/dashboard";
 import { PartData } from "@/interfaces/part";
+import { getPartList } from "@/redux/slices/part";
 
 const index = () => {
   const { partData } = useSelector((state) => state.dashboard);
@@ -38,6 +39,9 @@ const index = () => {
   // useEffect(() => {
   //   dispatch(getAllPart());
   // });
+  useEffect(() => {
+    dispatch(getPartList());
+  }, []);
 
   useEffect(() => {
     dispatch(getAllPart());
