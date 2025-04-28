@@ -10,7 +10,9 @@ import { getProjects } from "@/redux/slices/project";
 import SelectDropdown from "@/app/components/Form/hook-form/InputSelect";
 import { project } from "@/interfaces/project";
 import { PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import { insertPart } from "@/redux/slices/part";
+import { insertPart, resetPartData } from "@/redux/slices/part";
+import { ToastContainer, toast } from "react-toastify";
+
 const Insert = () => {
   const [file, setFile] = useState<File | null>(null);
   const [location, setLocation] = useState<number[]>([]);
@@ -108,193 +110,210 @@ const Insert = () => {
     dispatch(getProjects());
   }, []);
 
+  useEffect(() => {
+    if (part.data) {
+      toast.success("Part uploaded successfully!");
+      setTimeout(() => {
+        dispatch(resetPartData());
+      }, 5000);
+    }
+  }, [part.data]);
   return (
-    <div>
-      <FormProvider
-        className="space-y-6"
-        methods={methods}
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <div className="w-full sm:w-1/4">
-          <InputText
-            size="small"
-            type="text"
-            label="Part Name"
-            name="name"
-            control={control}
-            required
-            fullWidth
-          />
-          {(data ?? []).length > 0 && (
-            <SelectDropdown
-              options={
-                data?.map((project: project) => ({
-                  label: project.name,
-                  value: project._id,
-                })) || []
-              }
+    <div className="flex flex-col h-screen justify-center items-center overflow-auto">
+      <div className="w-full sm:w-[700px] border border-gray-50 p-3 rounded-lg shadow-md overflow-auto">
+        <FormProvider
+          className="space-y-6"
+          methods={methods}
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <div className="w-full">
+            <InputText
               size="small"
-              label="Select a Project"
-              name="projectId"
+              type="text"
+              label="Part Name"
+              name="name"
               control={control}
               required
               fullWidth
             />
-          )}
-        </div>
-        <div className="">
-          <label
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            htmlFor="file_input"
-          >
-            Upload file
-          </label>
-          <input
-            multiple={false}
-            className="block text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 w-[500px]"
-            aria-describedby="file_input_help"
-            id="file_input"
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                setFile(file);
-              }
-            }}
-          />
-          <p
-            className="mt-1 text-sm text-gray-500 dark:text-gray-300"
-            id="file_input_help"
-          >
-            SVG, PNG, JPG or GIF (MAX. 800x400px).
-          </p>
-          <div className="py-2">
-            <div className="flex gap-2">
-              <div>Locations</div>
-              <button
-                type="button"
-                onClick={() =>
-                  append({
-                    name: "",
-                    value: "",
-                    isHold: false,
-                  })
+            {(data ?? []).length > 0 && (
+              <SelectDropdown
+                options={
+                  data?.map((project: project) => ({
+                    label: project.name,
+                    value: project._id,
+                  })) || []
                 }
-              >
-                <PlusCircleIcon className="h-6 w-6 text-blue-800" />
-              </button>
-            </div>
-            <div className="flex gap-2">
-              {locationFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="flex gap-2 border border-gray-300 p-2 rounded-md"
+                size="small"
+                label="Select a Project"
+                name="projectId"
+                control={control}
+                required
+                fullWidth
+              />
+            )}
+          </div>
+          <div className="">
+            <label
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              htmlFor="file_input"
+            >
+              Upload file
+            </label>
+            <input
+              multiple={false}
+              className="block text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50  sm:w-[500px] w-full"
+              aria-describedby="file_input_help"
+              id="file_input"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setFile(file);
+                }
+              }}
+            />
+            <p
+              className="mt-1 text-sm text-gray-500 dark:text-gray-300"
+              id="file_input_help"
+            >
+              SVG, PNG, JPG or GIF (MAX. 800x400px).
+            </p>
+            <div className="py-2">
+              <div className="flex gap-2">
+                <div>Locations</div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    append({
+                      name: "",
+                      value: "",
+                      isHold: false,
+                    })
+                  }
                 >
-                  <div className="flex flex-col gap-1">
-                    <span>Location {index + 1}</span>
-                    <input
-                      type="text"
-                      placeholder="Location Name"
-                      className="rounded-sm border border-gray-200 px-2 py-1"
-                      {...methods.register(`locations.${index}.name` as const)}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Value"
-                      className="rounded-sm border border-gray-200 px-2 py-1"
-                      {...methods.register(`locations.${index}.value` as const)}
-                    />
-                    <label className="flex items-center gap-1 mt-1">
-                      <input
-                        type="checkbox"
-                        {...methods.register(
-                          `locations.${index}.isHold` as const
-                        )}
-                      />
-                      Hold
-                    </label>
-                  </div>
-                  <XMarkIcon
-                    className="h-6 w-6 text-red-600 cursor-pointer"
-                    onClick={() => remove(index)}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-col gap-2 mt-4 w-full sm:w-1/4 border border-gray-300 rounded-md p-2">
-              <label className="font-semibold">On Hold</label>
-              <InputText
-                type="text"
-                label="Name"
-                name="onHold.name"
-                control={control}
-                fullWidth
-                required
-                size="small"
-              />
-              <InputText
-                type="text"
-                label="Value"
-                name="onHold.value"
-                control={control}
-                fullWidth
-                required
-                size="small"
-              />
-            </div>
-            <div>
-              <div className="flex flex-col gap-2 mt-4">
-                <div className="flex items-center">
-                  <span className="font-semibold">Tag Lines</span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      appendTagLine({
-                        name: "",
-                        value: "",
-                      })
-                    }
-                    className="text-blue-700"
-                  >
-                    <PlusCircleIcon className="h-6 w-6" />
-                  </button>
-                </div>
-
-                {tagLineFields.map((field, index) => (
+                  <PlusCircleIcon className="h-6 w-6 text-blue-800" />
+                </button>
+              </div>
+              <div className="grid sm:grid-cols-3 grid-cols-1 gap-2 h-96 overflow-scroll">
+                {locationFields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="flex items-center gap-2 border border-gray-300 p-2 rounded-md"
+                    className="flex gap-2 border border-gray-300 p-2 rounded-md h-fit"
                   >
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      {...methods.register(`tagLines.${index}.name` as const)}
-                      className="rounded-sm border border-gray-200 px-2 py-1"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Value"
-                      {...methods.register(`tagLines.${index}.value` as const)}
-                      className="rounded-sm border border-gray-200 px-2 py-1"
-                    />
+                    <div className="flex flex-col gap-1">
+                      <span>Location {index + 1}</span>
+                      <input
+                        type="text"
+                        placeholder="Location Name"
+                        className="rounded-sm border border-gray-200 px-2 py-1 w-48"
+                        {...methods.register(
+                          `locations.${index}.name` as const
+                        )}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Value"
+                        className="rounded-sm border border-gray-200 px-2 py-1 w-48"
+                        {...methods.register(
+                          `locations.${index}.value` as const
+                        )}
+                      />
+                      <label className="flex items-center gap-1 mt-1">
+                        <input
+                          type="checkbox"
+                          {...methods.register(
+                            `locations.${index}.isHold` as const
+                          )}
+                        />
+                        Hold
+                      </label>
+                    </div>
                     <XMarkIcon
                       className="h-6 w-6 text-red-600 cursor-pointer"
-                      onClick={() => removeTagLine(index)}
+                      onClick={() => remove(index)}
                     />
                   </div>
                 ))}
               </div>
+              <div className="flex flex-col gap-2 mt-4 w-full sm:w-1/4 border border-gray-300 rounded-md p-2">
+                <label className="font-semibold">On Hold</label>
+                <InputText
+                  type="text"
+                  label="Name"
+                  name="onHold.name"
+                  control={control}
+                  fullWidth
+                  required
+                  size="small"
+                />
+                <InputText
+                  type="text"
+                  label="Value"
+                  name="onHold.value"
+                  control={control}
+                  fullWidth
+                  required
+                  size="small"
+                />
+              </div>
+              <div>
+                <div className="flex flex-col gap-2 mt-4">
+                  <div className="flex items-center">
+                    <span className="font-semibold">Tag Lines</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        appendTagLine({
+                          name: "",
+                          value: "",
+                        })
+                      }
+                      className="text-blue-700"
+                    >
+                      <PlusCircleIcon className="h-6 w-6" />
+                    </button>
+                  </div>
+
+                  {tagLineFields.map((field, index) => (
+                    <div
+                      key={field.id}
+                      className="flex items-center gap-2 border border-gray-300 p-2 rounded-md"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Name"
+                        {...methods.register(`tagLines.${index}.name` as const)}
+                        className="rounded-sm border border-gray-200 px-2 py-1"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Value"
+                        {...methods.register(
+                          `tagLines.${index}.value` as const
+                        )}
+                        className="rounded-sm border border-gray-200 px-2 py-1"
+                      />
+                      <XMarkIcon
+                        className="h-6 w-6 text-red-600 cursor-pointer"
+                        onClick={() => removeTagLine(index)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-        >
-          Submit
-        </button>
-      </FormProvider>
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          >
+            Submit
+          </button>
+        </FormProvider>
+      </div>
+      <ToastContainer />
     </div>
   );
 };

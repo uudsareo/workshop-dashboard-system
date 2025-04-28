@@ -38,7 +38,7 @@ const Dashboard = ({
         ))}
       </div>
       <div className="flex flex-col justify-between">
-        <div className="bg-[#F00B0F] flex flex-col items-center px-5 py-10 rounded-lg gap-5">
+        <div className="bg-[#F00B0F] flex flex-col items-center px-5 py-10 rounded-lg gap-5 min-w-80">
           <div className="text-white font-bold text-6xl">{onHold.name}</div>
           <div className="text-white font-bold text-9xl">{onHold.value}</div>
         </div>

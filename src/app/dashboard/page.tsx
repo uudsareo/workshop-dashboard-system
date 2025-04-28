@@ -1,6 +1,7 @@
 "use client";
+import io, { Socket } from "socket.io-client";
 import { dispatch, useSelector } from "@/redux/store";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { set, useForm } from "react-hook-form";
 import { Dashboard } from "../components/DashboardTile";
 import FormProvider from "../components/Form/hook-form/FormProvider";
@@ -22,38 +23,90 @@ import {
 } from "@heroicons/react/16/solid";
 import { DashboardTile } from "../constants/dashboard";
 import { getAllPart } from "@/redux/slices/dashboard";
-import { PartData } from "@/interfaces/part";
-import { getPartList } from "@/redux/slices/part";
+import { PartData, PartWithProject } from "@/interfaces/part";
+import { getPartList, removePartById } from "@/redux/slices/part";
 
-const index = () => {
-  const { partData } = useSelector((state) => state.dashboard);
+const DashboardPage = () => {
+  const socketRef = useRef<Socket | null>(null);
+
+  const { partData: Part } = useSelector((state) => state.dashboard);
 
   const [count, setCount] = useState<number>(1);
   const [current, setCurrent] = useState<PartData[]>([]);
   const [page, setPage] = useState<number>(1);
-  const [totalCount, setTotalCount] = useState<number>(partData.length);
+  const [totalCount, setTotalCount] = useState<number>(Part.length);
   const [isShowing, setIsShowing] = useState(true);
-  console.log(current);
+  const [partData, setPartData] = useState<PartWithProject[]>([]);
+  const [currentPosition, setCurrentPosition] = useState(0);
+
+  const [projectCount, setProjectCount] = useState(0);
+  const [currentProject, setCurrentProject] = useState(0);
+
   const [progress, setProgress] = useState(0);
 
-  // useEffect(() => {
-  //   dispatch(getAllPart());
-  // });
+  const currentDate = new Date();
+  const formattedDate = `${currentDate.getFullYear()}-${String(
+    currentDate.getMonth() + 1
+  ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
+
   useEffect(() => {
-    dispatch(getPartList());
+    const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string);
+
+    socket.on("connect", () => {
+      console.log("Connected to socket:", socket.id);
+      socket.emit("register-tv", "tv-lobby");
+    });
+
+    socket.on("DASHBOARD", (payload) => {
+      console.log("Received payload:", payload);
+      if (payload.type === "UPDATE") {
+        dispatch(getAllPart(formattedDate));
+      } else if (payload.type === "ADD") {
+        dispatch(getAllPart(formattedDate));
+      } else if (payload.type === "DELETE") {
+        console.log("Deleting part with ID:", payload.data._id);
+        dispatch(getAllPart(formattedDate));
+      } else if (payload.type === "UNARCHIVE") {
+        dispatch(getAllPart(formattedDate));
+      }
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
+
+    socketRef.current = socket;
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   useEffect(() => {
-    dispatch(getAllPart());
+    const formattedDate = `${currentDate.getFullYear()}-${String(
+      currentDate.getMonth() + 1
+    ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
+    dispatch(getAllPart(formattedDate));
   }, []);
 
   useEffect(() => {
-    setCurrent(partData.slice(0, Math.max(0, count)));
-  }, [count, partData]);
+    setPartData(Part);
+    console.log("PartData", Part);
+  }, [Part]);
 
-  // useEffect(() => {
-  //   setCurrent(partData.slice(0, Math.max(0, count)));
-  // }, [count]);
+  useEffect(() => {
+    if (Part.length > 0) {
+      setTotalCount(Part[0].parts.length);
+      setCurrentProject(0);
+      setCurrent(Part[0].parts.slice(0, count));
+      setCurrentPosition(count);
+    } else if (Part.length === 0) {
+      setTotalCount(0);
+      setCurrentProject(0);
+      setCurrent([]);
+      setCurrentPosition(0);
+    }
+  }, [Part, count]);
 
   const secDelay = 2500;
 
@@ -77,25 +130,47 @@ const index = () => {
   //   }
   // }, [secDelay, current]);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setPage((prevPage) => {
-  //       const nextPage = prevPage + 1;
-  //       const startIndex = (nextPage - 1) * count;
-  //       const endIndex = startIndex + count;
+  useEffect(() => {
+    if (partData.length === 0) return;
+    const interval = setInterval(() => {
+      setPage((prevPage) => {
+        const nextPage = prevPage + 1;
+        const currentParts = partData[currentProject].parts;
+        const startIndex = (nextPage - 1) * count;
+        const endIndex = startIndex + count;
 
-  //       if (startIndex >= partData.length) {
-  //         setPage(1);
-  //         setCurrent(partData.slice(0, count));
-  //         return 1;
-  //       }
-  //       setCurrent(partData.slice(startIndex, endIndex));
-  //       return nextPage;
-  //     });
-  //   }, secDelay);
-  //   setTotalCount(partData.length);
-  //   return () => clearInterval(interval);
-  // }, [count]);
+        if (startIndex >= currentParts.length) {
+          const nextProjectIndex = currentProject + 1;
+
+          if (nextProjectIndex >= partData.length) {
+            // Loop back to first project
+            setCurrentProject(0);
+            const firstParts = partData[0].parts;
+            setPage(1);
+            setTotalCount(firstParts.length);
+            setCurrent(firstParts.slice(0, count));
+            setCurrentPosition(count);
+          } else {
+            // Move to next project
+            const nextParts = partData[nextProjectIndex].parts;
+            setCurrentProject(nextProjectIndex);
+            setPage(1);
+            setTotalCount(nextParts.length);
+            setCurrent(nextParts.slice(0, count));
+            setCurrentPosition(count);
+          }
+
+          return 1; // reset page for new project
+        } else {
+          setCurrent(currentParts.slice(startIndex, endIndex));
+          setCurrentPosition(endIndex);
+          return nextPage;
+        }
+      });
+    }, secDelay);
+
+    return () => clearInterval(interval);
+  }, [count, currentProject, Part]);
 
   return (
     <div className="flex flex-col w-full h-screen bg-gray-950">
@@ -130,7 +205,8 @@ const index = () => {
       </div>
       <div>
         <h1 className="text-white font-bold text-5xl text-center py-5">
-          PHOENIX - 04/22/2025
+          {Part.length > 0 && Part[currentProject].projectId.name} -{" "}
+          {/* {Part[currentProject].projectId.name} - 04/22/2025 */}
         </h1>
       </div>
       <div
@@ -139,7 +215,7 @@ const index = () => {
         }`}
       >
         {current.length > 0 &&
-          (current ?? []).map((item, idx) => (
+          current.map((item, idx) => (
             <Dashboard
               key={idx}
               imageSrc={ImageBg}
@@ -155,4 +231,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default DashboardPage;

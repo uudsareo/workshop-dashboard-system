@@ -1,3 +1,5 @@
+import { project } from "./project";
+
 export interface Location {
   name: string;
   value: string;
@@ -13,6 +15,16 @@ export interface TagLine {
   name: string;
   value: string | number;
 }
+
+export interface dashboardData {
+  data: PartWithProject[];
+}
+
+export interface PartWithProject {
+  projectId: project;
+  parts: PartData[];
+}
+
 export interface DashBoard {
   type: string;
   data: PartData[];
@@ -30,4 +42,5 @@ export interface PartData {
   locations: Location[];
   onHold: Hold;
   tagLines: TagLine[];
+  isActive?: boolean;
 }

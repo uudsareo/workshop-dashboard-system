@@ -2,19 +2,63 @@
 import { dispatch, useSelector } from "@/redux/store";
 import React, { useEffect, useState } from "react";
 
-import { getPartList } from "@/redux/slices/part";
+import { archivePart, getPartList } from "@/redux/slices/part";
 import { Bars3Icon } from "@heroicons/react/16/solid";
 import { useRouter } from "next/navigation";
 
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
+import Checkbox from "@mui/material/Checkbox";
+import { PartData } from "@/interfaces/part";
+
+const label = { inputProps: { "aria-label": "Checkbox demo" } };
+
 const PartList = () => {
+  const [date, setDate] = useState<string | null>();
+  const [isActive, setIsActive] = useState<PartData | null>();
   const { data } = useSelector((state) => state.partData);
   const router = useRouter();
+
   useEffect(() => {
-    dispatch(getPartList());
-  }, []);
+    if (date) {
+      dispatch(getPartList(date));
+    } else {
+      dispatch(getPartList(null));
+    }
+  }, [date]);
+
+  useEffect(() => {
+    if (isActive?._id) {
+      (async () => {
+        if (isActive?._id) {
+          const res = await dispatch(
+            archivePart(isActive._id, isActive.isActive ? false : true)
+          );
+          if (res?.status === 200) {
+            const date = new Date();
+            dispatch(getPartList(date.toISOString().split("T")[0]));
+          }
+        }
+      })();
+    }
+  }, [isActive]);
 
   return (
     <div>
+      <div className="pt-5 px-10 flex items-center gap-2">
+        <div className="text-lg">Filter By Date</div>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Pick a date"
+            onChange={(date) => {
+              console.log(date ? date.format("YYYY-MM-DD") : null);
+              setDate(date ? date.format("YYYY-MM-DD") : null);
+            }}
+          />
+        </LocalizationProvider>
+      </div>
       <div className="p-10">
         <div className="relative overflow-x-auto">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -44,6 +88,16 @@ const PartList = () => {
                     {part.projectId.name}
                   </th>
                   <td className="px-6 py-4">{part.name}</td>
+                  <td className="px-6 py-4">
+                    <Checkbox
+                      {...label}
+                      checked={part.isActive ? true : false}
+                      size="small"
+                      onClick={() => {
+                        setIsActive(part);
+                      }}
+                    />
+                  </td>
                   <td className="px-6 py-4">
                     <button
                       type="button"

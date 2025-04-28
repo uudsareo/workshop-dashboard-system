@@ -1,11 +1,16 @@
 "use client";
-import { DashBoard, PartData } from "@/interfaces/part";
+import {
+  DashBoard,
+  dashboardData,
+  PartData,
+  PartWithProject,
+} from "@/interfaces/part";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { dispatch } from "../store";
 import Axios from "../../lib/axios";
 
 type InitialState = {
-  partData: PartData[];
+  partData: PartWithProject[];
   notifications: any;
   isLoading: boolean;
   error: any;
@@ -48,11 +53,11 @@ export default slice.reducer;
 
 export const { setNotification, setPart } = slice.actions;
 
-export function getAllPart() {
+export function getAllPart(date: string) {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
-      const res = await Axios.get("/part");
+      const res = await Axios.get(`/part?date=${date}`);
       dispatch(setPart(res.data.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error));

@@ -52,11 +52,24 @@ const slice = createSlice({
     setImageUrl(state, action) {
       state.imageUrl = action.payload;
     },
+    resetPartData(state) {
+      state.data = null;
+    },
+    removePartById(state, action: PayloadAction<string>) {
+      state.data =
+        state.data?.filter((part) => part._id !== action.payload) || null;
+    },
   },
 });
 
-export const { setProjects, setImageUrl, setPart, setSelectedPart } =
-  slice.actions;
+export const {
+  setProjects,
+  setImageUrl,
+  setPart,
+  setSelectedPart,
+  resetPartData,
+  removePartById,
+} = slice.actions;
 
 // Reducer
 export default slice.reducer;
@@ -78,19 +91,26 @@ export function insertPart(file: File, data: any) {
         ...data,
         imagePath: res.data.filePath,
       });
-      dispatch(slice.actions.setPart(partRes.data));
+      console.log("partRes", partRes);
+      if (partRes.status === 201) {
+        dispatch(slice.actions.setPart(partRes.data));
+      } else {
+        dispatch(slice.actions.hasError("Something went wrong"));
+      }
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }
   };
 }
 
-export function getPartList() {
+export function getPartList(date: string | null) {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
-      const res = await Axios.get(`${url}`);
-      dispatch(setPart(res.data.data));
+      const res = await Axios.get(
+        `${url}-no-filter${date ? `?date=${date}` : ""}`
+      );
+      dispatch(setPart(res.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }
@@ -115,6 +135,19 @@ export function updatePart(id: string, data: any) {
     try {
       const res = await Axios.put(`${url}/${id}`, data);
       dispatch(setSelectedPart(res.data));
+    } catch (error) {
+      dispatch(slice.actions.hasError(error));
+    }
+  };
+}
+
+export function archivePart(id: string, isActive: boolean) {
+  return async () => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const res = await Axios.put(`${url}/archive/${id}?isActive=${isActive}`);
+      dispatch(setSelectedPart(res.data));
+      return res;
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }
