@@ -43,4 +43,5 @@ export interface PartData {
   onHold: Hold;
   tagLines: TagLine[];
   isActive?: boolean;
+  createdAt?: string; // ISO date string
 }

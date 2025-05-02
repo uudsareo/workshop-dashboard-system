@@ -6,6 +6,8 @@ import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import dashboardReducer from "./slices/dashboard";
 import projectReducer from "./slices/project";
 import partReducer from "./slices/part";
+import notificationReducer from "./slices/notification";
+import settingsReducer from "./slices/setting";
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +46,8 @@ const rootReducer = combineReducers({
   dashboard: dashboardReducer,
   project: projectReducer,
   partData: partReducer,
+  notification: notificationReducer,
+  settings: settingsReducer,
 });
 
 export { rootPersistConfig, rootReducer };

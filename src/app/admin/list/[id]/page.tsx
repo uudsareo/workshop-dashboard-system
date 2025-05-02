@@ -122,117 +122,119 @@ const EditPart = () => {
   };
 
   return (
-    <FormProvider
-      methods={methods}
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-4"
-    >
-      <InputText
-        type="text"
-        name="name"
-        label="Part Name"
-        control={control}
-        required
-        fullWidth
-      />
-      {(data ?? []).length > 0 && (
-        <SelectDropdown
-          options={
-            data?.map((project: project) => ({
-              label: project.name,
-              value: project._id,
-            })) || []
-          }
-          size="small"
-          label="Select a Project"
-          name="projectId"
+    <div className="py-2 pl-5">
+      <FormProvider
+        methods={methods}
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-4"
+      >
+        <InputText
+          type="text"
+          name="name"
+          label="Part Name"
           control={control}
           required
           fullWidth
         />
-      )}
+        {(data ?? []).length > 0 && (
+          <SelectDropdown
+            options={
+              data?.map((project: project) => ({
+                label: project.name,
+                value: project._id,
+              })) || []
+            }
+            size="small"
+            label="Select a Project"
+            name="projectId"
+            control={control}
+            required
+            fullWidth
+          />
+        )}
 
-      {/* Locations */}
-      <div>
-        <h3 className="font-semibold">Locations</h3>
+        {/* Locations */}
+        <div>
+          <h3 className="font-semibold">Locations</h3>
+          <button
+            type="button"
+            onClick={() => append({ name: "", value: "", isHold: false })}
+          >
+            <PlusCircleIcon className="w-5 h-5 text-blue-600" />
+          </button>
+          {locationFields.map((field, index) => (
+            <div key={field.id} className="flex gap-2 mt-2">
+              <input
+                {...methods.register(`locations.${index}.name`)}
+                placeholder="Name"
+              />
+              <input
+                {...methods.register(`locations.${index}.value`)}
+                placeholder="Value"
+              />
+              <input
+                type="checkbox"
+                {...methods.register(`locations.${index}.isHold`)}
+              />
+              <XMarkIcon
+                onClick={() => remove(index)}
+                className="w-5 h-5 text-red-600 cursor-pointer"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* On Hold */}
+        <InputText
+          type="text"
+          name="onHold.name"
+          label="On Hold Name"
+          control={control}
+          required
+        />
+        <InputText
+          type="text"
+          name="onHold.value"
+          label="On Hold Value"
+          control={control}
+          required
+        />
+
+        {/* Tag Lines */}
+        <div>
+          <h3 className="font-semibold">Tag Lines</h3>
+          <button
+            type="button"
+            onClick={() => appendTagLine({ name: "", value: "" })}
+          >
+            <PlusCircleIcon className="w-5 h-5 text-blue-600" />
+          </button>
+          {tagLineFields.map((field, index) => (
+            <div key={field.id} className="flex gap-2 mt-2">
+              <input
+                {...methods.register(`tagLines.${index}.name`)}
+                placeholder="Name"
+              />
+              <input
+                {...methods.register(`tagLines.${index}.value`)}
+                placeholder="Value"
+              />
+              <XMarkIcon
+                onClick={() => removeTagLine(index)}
+                className="w-5 h-5 text-red-600 cursor-pointer"
+              />
+            </div>
+          ))}
+        </div>
+
         <button
-          type="button"
-          onClick={() => append({ name: "", value: "", isHold: false })}
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
         >
-          <PlusCircleIcon className="w-5 h-5 text-blue-600" />
+          Update Part
         </button>
-        {locationFields.map((field, index) => (
-          <div key={field.id} className="flex gap-2 mt-2">
-            <input
-              {...methods.register(`locations.${index}.name`)}
-              placeholder="Name"
-            />
-            <input
-              {...methods.register(`locations.${index}.value`)}
-              placeholder="Value"
-            />
-            <input
-              type="checkbox"
-              {...methods.register(`locations.${index}.isHold`)}
-            />
-            <XMarkIcon
-              onClick={() => remove(index)}
-              className="w-5 h-5 text-red-600 cursor-pointer"
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* On Hold */}
-      <InputText
-        type="text"
-        name="onHold.name"
-        label="On Hold Name"
-        control={control}
-        required
-      />
-      <InputText
-        type="text"
-        name="onHold.value"
-        label="On Hold Value"
-        control={control}
-        required
-      />
-
-      {/* Tag Lines */}
-      <div>
-        <h3 className="font-semibold">Tag Lines</h3>
-        <button
-          type="button"
-          onClick={() => appendTagLine({ name: "", value: "" })}
-        >
-          <PlusCircleIcon className="w-5 h-5 text-blue-600" />
-        </button>
-        {tagLineFields.map((field, index) => (
-          <div key={field.id} className="flex gap-2 mt-2">
-            <input
-              {...methods.register(`tagLines.${index}.name`)}
-              placeholder="Name"
-            />
-            <input
-              {...methods.register(`tagLines.${index}.value`)}
-              placeholder="Value"
-            />
-            <XMarkIcon
-              onClick={() => removeTagLine(index)}
-              className="w-5 h-5 text-red-600 cursor-pointer"
-            />
-          </div>
-        ))}
-      </div>
-
-      <button
-        type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Update Part
-      </button>
-    </FormProvider>
+      </FormProvider>
+    </div>
   );
 };
 

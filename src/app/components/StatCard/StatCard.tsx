@@ -14,11 +14,15 @@ const StatCard = ({ title, value, color = "DEFAULT" }: StatCardProps) => {
   };
   return (
     <div
-      className={`flex flex-col justify-center items-center gap-2 ${getColor()} rounded-lg p-4 w-56`}
+      className={`flex flex-col justify-center items-center gap-2 ${getColor()} rounded-lg 3xl:p-4 p-1 w-full`}
     >
       <div className="flex flex-col justify-center items-center gap-2">
-        <div className="text-white text-2xl font-bold uppercase">{title}</div>
-        <div className="text-white font-bold text-8xl">{value}</div>
+        <div className="text-white 3xl:text-2xl text-lg font-bold uppercase">
+          {title}
+        </div>
+        <div className="text-white font-bold 3xl:text-8xl text-4xl">
+          {value}
+        </div>
       </div>
     </div>
   );

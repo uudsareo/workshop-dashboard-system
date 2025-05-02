@@ -25,13 +25,18 @@ import { DashboardTile } from "../constants/dashboard";
 import { getAllPart } from "@/redux/slices/dashboard";
 import { PartData, PartWithProject } from "@/interfaces/part";
 import { getPartList, removePartById } from "@/redux/slices/part";
+import { INotification } from "@/interfaces/notification";
+import { getSettings } from "@/redux/slices/setting";
+import { ISetting } from "@/interfaces/setting";
+import { DefaultSetting } from "../constants/setting";
 
 const DashboardPage = () => {
   const socketRef = useRef<Socket | null>(null);
 
   const { partData: Part } = useSelector((state) => state.dashboard);
+  const { data: settingsData } = useSelector((state) => state.settings);
 
-  const [count, setCount] = useState<number>(1);
+  // const [count, setCount] = useState<number>(1);
   const [current, setCurrent] = useState<PartData[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(Part.length);
@@ -42,7 +47,13 @@ const DashboardPage = () => {
   const [projectCount, setProjectCount] = useState(0);
   const [currentProject, setCurrentProject] = useState(0);
 
+  const [setting, setSetting] = useState<ISetting | null>(DefaultSetting);
+
   const [progress, setProgress] = useState(0);
+
+  //----- NOTIFI
+  const [immediateNotification, setImmediateNotification] =
+    useState<INotification | null>();
 
   const currentDate = new Date();
   const formattedDate = `${currentDate.getFullYear()}-${String(
@@ -68,7 +79,18 @@ const DashboardPage = () => {
         dispatch(getAllPart(formattedDate));
       } else if (payload.type === "UNARCHIVE") {
         dispatch(getAllPart(formattedDate));
+      } else if (payload.type === "SETTINGS") {
+        setSetting(payload.data);
       }
+    });
+
+    socket.on("NOTIFICATION", (payload) => {
+      console.log("Received payload:", payload);
+      setImmediateNotification(payload.notification);
+      console.log("Notification payload:", payload.notification);
+      setTimeout(() => {
+        setImmediateNotification(null);
+      }, payload.notification.duration * 1000);
     });
 
     socket.on("disconnect", () => {
@@ -87,34 +109,38 @@ const DashboardPage = () => {
       currentDate.getMonth() + 1
     ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
     dispatch(getAllPart(formattedDate));
+    dispatch(getSettings());
   }, []);
 
   useEffect(() => {
     setPartData(Part);
-    console.log("PartData", Part);
   }, [Part]);
+
+  useEffect(() => {
+    if (settingsData) {
+      setSetting(settingsData);
+    }
+  }, [settingsData]);
 
   useEffect(() => {
     if (Part.length > 0) {
       setTotalCount(Part[0].parts.length);
       setCurrentProject(0);
-      setCurrent(Part[0].parts.slice(0, count));
-      setCurrentPosition(count);
+      setCurrent(Part[0].parts.slice(0, setting?.setting.gridCount ?? 1));
+      setCurrentPosition(setting?.setting.gridCount ?? 1);
     } else if (Part.length === 0) {
       setTotalCount(0);
       setCurrentProject(0);
       setCurrent([]);
       setCurrentPosition(0);
     }
-  }, [Part, count]);
-
-  const secDelay = 2500;
+  }, [Part, setting?.setting.gridCount]);
 
   // useEffect(() => {
-  //   if (secDelay > 0) {
+  //   if (setting?.setting?.duration ?? 60000 > 0) {
   //     setProgress(0);
 
-  //     const increment = 100 / (secDelay / 100);
+  //     const increment = 100 / (setting?.setting?.duration ?? 60000 / 100);
   //     const timer = setInterval(() => {
   //       setProgress((prevProgress) => {
   //         const nextProgress = prevProgress + increment;
@@ -128,7 +154,9 @@ const DashboardPage = () => {
 
   //     return () => clearInterval(timer);
   //   }
-  // }, [secDelay, current]);
+  // }, [setting?.setting?.duration]);
+
+  console.log("se:", setting?.setting?.duration);
 
   useEffect(() => {
     if (partData.length === 0) return;
@@ -136,8 +164,8 @@ const DashboardPage = () => {
       setPage((prevPage) => {
         const nextPage = prevPage + 1;
         const currentParts = partData[currentProject].parts;
-        const startIndex = (nextPage - 1) * count;
-        const endIndex = startIndex + count;
+        const startIndex = (nextPage - 1) * setting?.setting.gridCount!;
+        const endIndex = startIndex + setting?.setting.gridCount!;
 
         if (startIndex >= currentParts.length) {
           const nextProjectIndex = currentProject + 1;
@@ -148,16 +176,16 @@ const DashboardPage = () => {
             const firstParts = partData[0].parts;
             setPage(1);
             setTotalCount(firstParts.length);
-            setCurrent(firstParts.slice(0, count));
-            setCurrentPosition(count);
+            setCurrent(firstParts.slice(0, setting?.setting.gridCount!));
+            setCurrentPosition(setting?.setting.gridCount!);
           } else {
             // Move to next project
             const nextParts = partData[nextProjectIndex].parts;
             setCurrentProject(nextProjectIndex);
             setPage(1);
             setTotalCount(nextParts.length);
-            setCurrent(nextParts.slice(0, count));
-            setCurrentPosition(count);
+            setCurrent(nextParts.slice(0, setting?.setting.gridCount!));
+            setCurrentPosition(setting?.setting.gridCount!);
           }
 
           return 1; // reset page for new project
@@ -167,58 +195,50 @@ const DashboardPage = () => {
           return nextPage;
         }
       });
-    }, secDelay);
+    }, (setting?.setting?.duration ?? 60) * 1000);
 
     return () => clearInterval(interval);
-  }, [count, currentProject, Part]);
+  }, [setting?.setting.gridCount!, currentProject, partData]);
 
   return (
-    <div className="flex flex-col w-full h-screen bg-gray-950">
-      <div className="fixed top-1 right-0 w-52 text-right">
-        <Menu>
-          <MenuButton className="inline-flex items-center gap-2 rounded-md bg-gray-800 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-700 data-[open]:bg-gray-700 data-[focus]:outline-1 data-[focus]:outline-white">
-            GRID CONFIGURATION
-            <ChevronDownIcon className="size-4 fill-white/60" />
-          </MenuButton>
+    <div className="flex flex-col h-screen w-screen bg-[#1E1D1D]">
+      {immediateNotification && (
+        <div className="fixed top-0 left-0 right-0 z-50 p-4 bg-gray-800 text-white h-screen">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {/* <Square2StackIcon className="h-6 w-6" /> */}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: immediateNotification.content,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
-          <MenuItems
-            transition
-            anchor="bottom end"
-            className="w-52 bg-gray-400 origin-top-right rounded-xl border border-white/5 p-1 text-sm/6 text-white transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
-          >
-            {DashboardTile.map((item, idx) => (
-              <MenuItem key={idx}>
-                <button
-                  onClick={() => setCount(item)}
-                  className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white/10"
-                >
-                  {/* <PencilIcon className="size-4 fill-white/30" /> */}
-                  {item} GRID
-                  <kbd className="ml-auto hidden font-sans text-xs text-white/50 group-data-[focus]:inline">
-                    ⌘E
-                  </kbd>
-                </button>
-              </MenuItem>
-            ))}
-          </MenuItems>
-        </Menu>
-      </div>
       <div>
-        <h1 className="text-white font-bold text-5xl text-center py-5">
-          {Part.length > 0 && Part[currentProject].projectId.name} -{" "}
-          {/* {Part[currentProject].projectId.name} - 04/22/2025 */}
+        <h1 className="text-white font-bold 3xl:text-5xl text-xl text-center py-5">
+          {Part.length > 0 &&
+            Part[currentProject].projectId.name +
+              " - " +
+              new Date(Part[currentProject].parts[0].createdAt ?? "")
+                .toISOString()
+                .split("T")[0]}
         </h1>
       </div>
       <div
-        className={`grid gap-4 p-4 ${
-          count === 1 ? "grid-cols-1 place-items-center" : "grid-cols-2"
+        className={`grid gap-4 p-1 ${
+          setting?.setting.gridCount! === 1
+            ? "grid-cols-1 place-items-center"
+            : "grid-cols-2"
         }`}
       >
         {current.length > 0 &&
           current.map((item, idx) => (
             <Dashboard
               key={idx}
-              imageSrc={ImageBg}
+              imageSrc={item.imagePath}
               locations={item.locations}
               partName={item.name}
               tagLines={item.tagLines}

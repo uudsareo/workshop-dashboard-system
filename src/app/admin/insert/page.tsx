@@ -107,6 +107,7 @@ const Insert = () => {
   };
 
   useEffect(() => {
+    dispatch(resetPartData());
     dispatch(getProjects());
   }, []);
 
@@ -118,6 +119,7 @@ const Insert = () => {
       }, 5000);
     }
   }, [part.data]);
+
   return (
     <div className="flex flex-col h-screen justify-center items-center overflow-auto">
       <div className="w-full sm:w-[700px] border border-gray-50 p-3 rounded-lg shadow-md overflow-auto">

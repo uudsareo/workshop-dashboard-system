@@ -17,16 +17,21 @@ const Dashboard = ({
   progress,
 }: DashboardTileProps) => {
   return (
-    <div className="flex bg-[#1E1D1D] p-4 gap-5">
-      <div className="w-52">
-        <div className="text-white font-black text-3xl w-full text-center py-2">
+    <div className="flex bg-[#1E1D1D] 3xl:p-4 p-2 3xl:gap-5 gap-2 h-fit w-full">
+      <div className="w-3/12">
+        <div className="text-white font-black 3xl:text-3xl text-lg w-full text-center py-2 h-2/12">
           {partName}
         </div>
-        <div className="h-[450px] relative overflow-hidden">
-          <Image src={imageSrc} alt="Image" layout="fill" objectFit="cover" />
+        <div className="relative overflow-hidden 3xl:pb-10 pb-1 h-10/12">
+          <Image
+            src={`${process.env.NEXT_PUBLIC_IMGPATH}/${imageSrc}`}
+            alt="Image"
+            fill
+            style={{ objectFit: "cover" }}
+          />
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 3xl:gap-4 gap-1 w-6/12">
         {locations.map((location, idx) => (
           <div key={idx}>
             <StatCard
@@ -37,20 +42,19 @@ const Dashboard = ({
           </div>
         ))}
       </div>
-      <div className="flex flex-col justify-between">
-        <div className="bg-[#F00B0F] flex flex-col items-center px-5 py-10 rounded-lg gap-5 min-w-80">
-          <div className="text-white font-bold text-6xl">{onHold.name}</div>
-          <div className="text-white font-bold text-9xl">{onHold.value}</div>
+      <div className="flex flex-col justify-between w-3/12">
+        <div className="bg-[#F00B0F] flex flex-col items-center px-5 3xl:py-10 py-5 rounded-lg gap-5 w-full">
+          <div className="text-white font-bold text-3xl 3xl:text-6xl">{onHold.name}</div>
+          <div className="text-white font-bold text-7xl 3xl:text-6xl">{onHold.value}</div>
         </div>
-        <div className="pt-3 flex flex-col gap-3">
+        <div className="pt-3 flex flex-col 3xl:gap-3 gap-1">
           {tagLines.map((tagLine, idx) => (
             <TagLine key={idx} name={tagLine.name} value={tagLine.value} />
           ))}
         </div>
       </div>
-      <div className="flex flex-col justify-end">
+      {/* <div className="flex flex-col justify-end">
         <div className="text-white">
-          {/* {progress.toFixed(0)}% */}
           <CircularProgress
             variant="determinate"
             value={progress}
@@ -58,7 +62,7 @@ const Dashboard = ({
             size="80px"
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
