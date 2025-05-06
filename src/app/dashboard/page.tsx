@@ -138,7 +138,7 @@ const DashboardPage = () => {
 
       return () => clearInterval(timer);
     }
-  }, [setting?.setting?.duration]);
+  }, [setting?.setting?.duration, currentPosition]);
 
   useEffect(() => {
     if (partData.length === 0) return;
@@ -180,7 +180,7 @@ const DashboardPage = () => {
     }, (setting?.setting?.duration ?? 60) * 1000);
 
     return () => clearInterval(interval);
-  }, [setting?.setting.gridCount!, currentProject, partData, currentPosition]);
+  }, [setting?.setting.gridCount!, currentProject, partData]);
 
   return (
     <div className="flex flex-col h-screen w-screen bg-black">
