@@ -12,6 +12,7 @@ import { project } from "@/interfaces/project";
 import { PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { insertPart, resetPartData } from "@/redux/slices/part";
 import { ToastContainer, toast } from "react-toastify";
+import { locations } from "@/app/constants/dashboard";
 
 const Insert = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -73,13 +74,7 @@ const Insert = () => {
     defaultValues: {
       name: "",
       projectId: "",
-      locations: [
-        {
-          name: "",
-          value: "",
-          isHold: false,
-        },
-      ],
+      locations: locations,
       onHold: {
         name: "On Hold",
         value: "",
@@ -127,13 +122,7 @@ const Insert = () => {
           reset({
             name: "",
             projectId: "",
-            locations: [
-              {
-                name: "",
-                value: "",
-                isHold: false,
-              },
-            ],
+            locations: locations,
             onHold: {
               name: "On Hold",
               value: "",
@@ -194,14 +183,14 @@ const Insert = () => {
           </div>
           <div className="">
             <label
-              className="block mb-2 text-sm font-medium text-gray-900"
+              className="block mb-2 text-sm font-medium text-black"
               htmlFor="file_input"
             >
               Upload file
             </label>
             <input
               multiple={false}
-              className="block text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50  sm:w-[500px] w-full"
+              className="block text-sm text-black border border-gray-300 rounded-lg cursor-pointer bg-gray-50  sm:w-[500px] w-full"
               aria-describedby="file_input_help"
               id="file_input"
               type="file"

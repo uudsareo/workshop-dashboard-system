@@ -8,7 +8,7 @@ export const dashboard = [
       { title: "EXPECTED QTY", value: "40" },
       { title: "Target Date", value: "04/20/2025" },
     ],
-    onHold : 22,
+    onHold: 22,
     locations: [
       {
         name: "Inspection",
@@ -52,7 +52,7 @@ export const dashboard = [
   {
     id: 2,
     name: "Part Two",
-    onHold : 20,
+    onHold: 20,
     tagLines: [
       { title: "RECEIVED QTY", value: "30" },
       { title: "RECEIVED DATE", value: "04/10/2025" },
@@ -84,7 +84,7 @@ export const dashboard = [
       {
         name: "wtp",
         value: 6,
-        isHold : true,
+        isHold: true,
       },
       {
         name: "clear coat",
@@ -103,7 +103,7 @@ export const dashboard = [
   {
     id: 3,
     name: "Part Three",
-    onHold : 31,
+    onHold: 31,
     tagLines: [
       { title: "RECEIVED QTY", value: "60" },
       { title: "RECEIVED DATE", value: "04/01/2025" },
@@ -126,7 +126,6 @@ export const dashboard = [
       {
         name: "primer",
         value: 11,
-
       },
       {
         name: "base coat",
@@ -143,7 +142,7 @@ export const dashboard = [
       {
         name: "polishing",
         value: 30,
-        isHold : true,
+        isHold: true,
       },
       {
         name: "assembly",
@@ -154,7 +153,7 @@ export const dashboard = [
   {
     id: 4,
     name: "Part Four",
-    onHold : 38,
+    onHold: 38,
     tagLines: [
       { title: "RECEIVED QTY", value: "99" },
       { title: "RECEIVED DATE", value: "04/02/2025" },
@@ -172,7 +171,7 @@ export const dashboard = [
       },
       {
         name: "Sanding",
-        value: 12
+        value: 12,
       },
       {
         name: "primer",
@@ -204,3 +203,15 @@ export const dashboard = [
 ];
 
 export const DashboardTile = [1, 2, 4, 8];
+
+export const locations = [
+  { name: "INSPECTION", value: "", isHold: false },
+  { name: "DISASSEMBLY", value: "", isHold: false },
+  { name: "SANDING", value: "", isHold: false },
+  { name: "PRIMER", value: "", isHold: false },
+  { name: "BASE COAT", value: "", isHold: false },
+  { name: "WTP", value: "", isHold: false },
+  { name: "CLEAT COAT", value: "", isHold: false },
+  { name: "POLISHING", value: "", isHold: false },
+  { name: "ASSEMBLY", value: "", isHold: false },
+];
