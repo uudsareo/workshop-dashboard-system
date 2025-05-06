@@ -121,8 +121,30 @@ const Insert = () => {
           imagePath: part.imageUrl,
         };
         const res = await dispatch(insertPart(file, formBody));
-        if (res?.status === 200) {
+
+        if (res?.status === 201) {
           toast.success("Part inserted successfully!");
+          reset({
+            name: "",
+            projectId: "",
+            locations: [
+              {
+                name: "",
+                value: "",
+                isHold: false,
+              },
+            ],
+            onHold: {
+              name: "On Hold",
+              value: "",
+            },
+            tagLines: [
+              {
+                name: "",
+                value: "",
+              },
+            ],
+          });
         }
       } else {
         console.error("No file selected for upload.");
