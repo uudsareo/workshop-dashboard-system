@@ -122,7 +122,7 @@ const EditPart = () => {
   };
 
   return (
-    <div className="py-2 pl-5">
+    <div className="py-2 pl-5 bg-white min-h-screen">
       <FormProvider
         methods={methods}
         onSubmit={handleSubmit(onSubmit)}

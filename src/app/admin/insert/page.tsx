@@ -54,7 +54,7 @@ const Insert = () => {
       .required(),
 
     onHold: Yup.object({
-      name: Yup.string().required(),
+      name: Yup.string().required().default("On Hold"),
       value: Yup.mixed<string | number>().required(),
     }).required(),
 
@@ -70,6 +70,27 @@ const Insert = () => {
 
   const methods = useForm<PartData>({
     resolver: yupResolver(partDataSchema),
+    defaultValues: {
+      name: "",
+      projectId: "",
+      locations: [
+        {
+          name: "",
+          value: "",
+          isHold: false,
+        },
+      ],
+      onHold: {
+        name: "On Hold",
+        value: "",
+      },
+      tagLines: [
+        {
+          name: "",
+          value: "",
+        },
+      ],
+    },
   });
 
   const { handleSubmit, control, reset, setValue } = methods;
@@ -99,7 +120,10 @@ const Insert = () => {
           ...formData,
           imagePath: part.imageUrl,
         };
-        await dispatch(insertPart(file, formBody));
+        const res = await dispatch(insertPart(file, formBody));
+        if (res?.status === 200) {
+          toast.success("Part inserted successfully!");
+        }
       } else {
         console.error("No file selected for upload.");
       }
@@ -111,17 +135,8 @@ const Insert = () => {
     dispatch(getProjects());
   }, []);
 
-  useEffect(() => {
-    if (part.data) {
-      toast.success("Part uploaded successfully!");
-      setTimeout(() => {
-        dispatch(resetPartData());
-      }, 5000);
-    }
-  }, [part.data]);
-
   return (
-    <div className="flex flex-col h-screen justify-center items-center overflow-auto">
+    <div className="flex flex-col h-screen justify-center items-center overflow-auto bg-white">
       <div className="w-full sm:w-[700px] border border-gray-50 p-3 rounded-lg shadow-md overflow-auto">
         <FormProvider
           className="space-y-6"
@@ -157,7 +172,7 @@ const Insert = () => {
           </div>
           <div className="">
             <label
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              className="block mb-2 text-sm font-medium text-gray-900"
               htmlFor="file_input"
             >
               Upload file
@@ -176,10 +191,7 @@ const Insert = () => {
                 }
               }}
             />
-            <p
-              className="mt-1 text-sm text-gray-500 dark:text-gray-300"
-              id="file_input_help"
-            >
+            <p className="mt-1 text-sm" id="file_input_help">
               SVG, PNG, JPG or GIF (MAX. 800x400px).
             </p>
             <div className="py-2">

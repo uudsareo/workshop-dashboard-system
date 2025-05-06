@@ -91,12 +91,13 @@ export function insertPart(file: File, data: any) {
         ...data,
         imagePath: res.data.filePath,
       });
-      console.log("partRes", partRes);
+
       if (partRes.status === 201) {
         dispatch(slice.actions.setPart(partRes.data));
       } else {
         dispatch(slice.actions.hasError("Something went wrong"));
       }
+      return partRes;
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }

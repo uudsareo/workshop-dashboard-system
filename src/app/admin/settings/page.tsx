@@ -29,7 +29,7 @@ const SettingPage = () => {
   };
 
   return (
-    <div className="bg-gray-100">
+    <div className="bg-white min-h-screen">
       <div className="p-5">
         <TextField
           required

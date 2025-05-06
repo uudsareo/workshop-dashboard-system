@@ -12,6 +12,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 import Checkbox from "@mui/material/Checkbox";
 import { PartData } from "@/interfaces/part";
+import dayjs from "dayjs";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -25,7 +26,7 @@ const PartList = () => {
     if (date) {
       dispatch(getPartList(date));
     } else {
-      dispatch(getPartList(null));
+      dispatch(getPartList(dayjs().format("YYYY-MM-DD")));
     }
   }, [date]);
 
@@ -46,14 +47,14 @@ const PartList = () => {
   }, [isActive]);
 
   return (
-    <div>
+    <div className="bg-white min-h-screen">
       <div className="pt-5 px-10 flex items-center gap-2">
         <div className="text-lg">Filter By Date</div>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
+            defaultValue={dayjs()}
             label="Pick a date"
             onChange={(date) => {
-              console.log(date ? date.format("YYYY-MM-DD") : null);
               setDate(date ? date.format("YYYY-MM-DD") : null);
             }}
           />
