@@ -1,20 +1,21 @@
 "use client";
+import nextDynamic from "next/dynamic"; // <-- renamed to avoid conflict
 import { Button } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import React, { useState } from "react";
-
 import Checkbox from "@mui/material/Checkbox";
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
-
-import ReactQuill from "react-quill-new";
-import "react-quill-new/dist/quill.snow.css";
 import { toast, ToastContainer } from "react-toastify";
 import { dispatch } from "@/redux/store";
 import { createNotification } from "@/redux/slices/notification";
+import "react-quill-new/dist/quill.snow.css";
+
+const ReactQuill = nextDynamic(() => import("react-quill-new"), {
+  ssr: false,
+});
+
+const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const Page = () => {
   const [value, setValue] = useState("");
@@ -32,7 +33,6 @@ const Page = () => {
     const res = await dispatch(
       createNotification(value, date || "", immediate, duration)
     );
-    console.log(res); 
     if (res?.status === 201) {
       toast.success("Notification created successfully.");
       setValue("");
@@ -44,7 +44,7 @@ const Page = () => {
 
   return (
     <div className="p-5">
-      <ReactQuill theme="snow" value={value} onChange={setValue}/>
+      <ReactQuill theme="snow" value={value} onChange={setValue} />
       <div>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
@@ -78,13 +78,7 @@ const Page = () => {
         &nbsp; seconds
       </div>
       <div className="py-4">
-        <Button
-          title="Submit"
-          variant="contained"
-          onClick={() => {
-            submitNotification();
-          }}
-        >
+        <Button title="Submit" variant="contained" onClick={submitNotification}>
           Submit
         </Button>
       </div>
@@ -93,4 +87,6 @@ const Page = () => {
   );
 };
 
+// Fix: no conflict with imported `nextDynamic`
+export const dynamic = "force-dynamic";
 export default Page;
