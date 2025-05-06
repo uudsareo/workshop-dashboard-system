@@ -12,7 +12,7 @@ import { project } from "@/interfaces/project";
 import { PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { insertPart, resetPartData } from "@/redux/slices/part";
 import { ToastContainer, toast } from "react-toastify";
-import { locations } from "@/app/constants/dashboard";
+import { locations, tagLines } from "@/app/constants/dashboard";
 
 const Insert = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -79,12 +79,7 @@ const Insert = () => {
         name: "On Hold",
         value: "",
       },
-      tagLines: [
-        {
-          name: "",
-          value: "",
-        },
-      ],
+      tagLines: tagLines,
     },
   });
 
@@ -127,12 +122,7 @@ const Insert = () => {
               name: "On Hold",
               value: "",
             },
-            tagLines: [
-              {
-                name: "",
-                value: "",
-              },
-            ],
+            tagLines: tagLines,
           });
         }
       } else {
@@ -225,7 +215,7 @@ const Insert = () => {
                 {locationFields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="flex gap-2 border border-gray-300 p-2 rounded-md h-fit"
+                    className="flex gap-2 border border-gray-300 p-2 rounded-md h-fit relative"
                   >
                     <div className="flex flex-col gap-1">
                       <span>Location {index + 1}</span>
@@ -255,10 +245,12 @@ const Insert = () => {
                         Hold
                       </label>
                     </div>
-                    <XMarkIcon
-                      className="h-6 w-6 text-red-600 cursor-pointer"
+                    <button
                       onClick={() => remove(index)}
-                    />
+                      className="absolute right-2 top-2"
+                    >
+                      <XMarkIcon className="h-6 w-6 text-red-600 cursor-pointer" />
+                    </button>
                   </div>
                 ))}
               </div>

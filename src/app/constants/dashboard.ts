@@ -215,3 +215,10 @@ export const locations = [
   { name: "POLISHING", value: "", isHold: false },
   { name: "ASSEMBLY", value: "", isHold: false },
 ];
+
+export const tagLines = [
+  { name: "RECEIVED DATE", value: "" },
+  { name: "RECEIVED QTY", value: "" },
+  { name: "TARGET DATE", value: "" },
+  { name: "DELIVERED QTY", value: "" },
+];
