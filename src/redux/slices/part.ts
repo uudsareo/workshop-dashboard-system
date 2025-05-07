@@ -136,6 +136,7 @@ export function updatePart(id: string, data: any) {
     try {
       const res = await Axios.put(`${url}/${id}`, data);
       dispatch(setSelectedPart(res.data));
+      return res;
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }

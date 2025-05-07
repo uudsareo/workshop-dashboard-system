@@ -13,6 +13,7 @@ import { PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { insertPart, resetPartData } from "@/redux/slices/part";
 import { ToastContainer, toast } from "react-toastify";
 import { locations, tagLines } from "@/app/constants/dashboard";
+import { Box, CircularProgress } from "@mui/material";
 
 const Insert = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -32,6 +33,7 @@ const Insert = () => {
     onHold: {
       name: string;
       value: string | number;
+      isComplete?: boolean;
     };
     tagLines: {
       name: string;
@@ -57,6 +59,7 @@ const Insert = () => {
     onHold: Yup.object({
       name: Yup.string().required().default("On Hold"),
       value: Yup.mixed<string | number>().required(),
+      isComplete: Yup.boolean().optional(),
     }).required(),
 
     tagLines: Yup.array()
@@ -78,6 +81,7 @@ const Insert = () => {
       onHold: {
         name: "On Hold",
         value: "",
+        isComplete: false,
       },
       tagLines: tagLines,
     },
@@ -121,6 +125,7 @@ const Insert = () => {
             onHold: {
               name: "On Hold",
               value: "",
+              isComplete: false,
             },
             tagLines: tagLines,
           });
@@ -274,6 +279,13 @@ const Insert = () => {
                   required
                   size="small"
                 />
+                <label className="flex items-center gap-1 mt-1">
+                  <input
+                    type="checkbox"
+                    {...methods.register(`onHold.isComplete` as const)}
+                  />
+                  Completed
+                </label>
               </div>
               <div>
                 <div className="flex flex-col gap-2 mt-4">
@@ -331,6 +343,13 @@ const Insert = () => {
         </FormProvider>
       </div>
       <ToastContainer />
+      {part.isLoading && (
+        <div className="fixed inset-0 bg-white/70 flex items-center justify-center z-50">
+          <Box sx={{ display: "flex" }}>
+            <CircularProgress />
+          </Box>
+        </div>
+      )}
     </div>
   );
 };

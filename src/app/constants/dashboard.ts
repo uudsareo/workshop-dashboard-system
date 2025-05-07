@@ -211,7 +211,7 @@ export const locations = [
   { name: "PRIMER", value: "", isHold: false },
   { name: "BASE COAT", value: "", isHold: false },
   { name: "WTP", value: "", isHold: false },
-  { name: "CLEAT COAT", value: "", isHold: false },
+  { name: "CLEAR COAT", value: "", isHold: false },
   { name: "POLISHING", value: "", isHold: false },
   { name: "ASSEMBLY", value: "", isHold: false },
 ];

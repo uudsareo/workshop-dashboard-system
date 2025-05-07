@@ -13,6 +13,8 @@ import SelectDropdown from "@/app/components/Form/hook-form/InputSelect";
 import { XMarkIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
 import { project } from "@/interfaces/project";
 import { getProjects } from "@/redux/slices/project";
+import { toast, ToastContainer } from "react-toastify";
+import { Box, CircularProgress } from "@mui/material";
 
 type PartData = {
   name: string;
@@ -25,6 +27,7 @@ type PartData = {
   onHold: {
     name: string;
     value: string | number;
+    isComplete?: boolean;
   };
   tagLines: {
     name: string;
@@ -46,6 +49,7 @@ const partDataSchema = Yup.object({
     .required(),
   onHold: Yup.object({
     name: Yup.string().required(),
+    isComplete: Yup.boolean().optional(),
     value: Yup.mixed<string | number>().required(),
   }).required(),
   tagLines: Yup.array()
@@ -61,6 +65,7 @@ const partDataSchema = Yup.object({
 const EditPart = () => {
   const { id } = useParams();
   const partData = useSelector((state) => state.partData.selectedPart);
+  const isLoading = useSelector((state) => state.partData.isLoading);
   const { data } = useSelector((state) => state.project);
 
   const methods = useForm<PartData>({
@@ -69,7 +74,7 @@ const EditPart = () => {
       name: "",
       projectId: "",
       locations: [],
-      onHold: { name: "", value: "" },
+      onHold: { name: "", value: "", isComplete: false },
       tagLines: [],
     },
   });
@@ -116,9 +121,13 @@ const EditPart = () => {
     dispatch(getProjects());
   }, []);
 
-  const onSubmit = (formValues: PartData) => {
-    console.log("Submitted data", formValues);
-    typeof id === "string" && dispatch(updatePart(id, formValues));
+  const onSubmit = async (formValues: PartData) => {
+    if (typeof id === "string") {
+      const res = await dispatch(updatePart(id, formValues));
+      if (res?.status === 200) {
+        toast.success("Part updated successfully");
+      }
+    }
   };
 
   return (
@@ -199,7 +208,13 @@ const EditPart = () => {
           control={control}
           required
         />
-
+        <label className="flex items-center gap-1 mt-1">
+          <input
+            type="checkbox"
+            {...methods.register(`onHold.isComplete` as const)}
+          />
+          Completed
+        </label>
         {/* Tag Lines */}
         <div>
           <h3 className="font-semibold">Tag Lines</h3>
@@ -234,6 +249,14 @@ const EditPart = () => {
           Update Part
         </button>
       </FormProvider>
+      <ToastContainer />
+      {isLoading && (
+        <div className="fixed inset-0 bg-white/70 flex items-center justify-center z-50">
+          <Box sx={{ display: "flex" }}>
+            <CircularProgress />
+          </Box>
+        </div>
+      )}
     </div>
   );
 };

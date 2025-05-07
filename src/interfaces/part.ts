@@ -9,6 +9,7 @@ export interface Location {
 export interface Hold {
   name: string;
   value: string | number;
+  isComplete?: boolean;
 }
 
 export interface TagLine {

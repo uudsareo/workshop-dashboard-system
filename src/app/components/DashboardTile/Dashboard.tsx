@@ -43,9 +43,17 @@ const Dashboard = ({
         ))}
       </div>
       <div className="flex flex-col justify-between w-3/12">
-        <div className="bg-[#F00B0F] flex flex-col items-center px-5 3xl:py-10 py-5 rounded-lg gap-5 w-full">
-          <div className="text-white font-bold text-3xl 3xl:text-6xl">{onHold.name}</div>
-          <div className="text-white font-bold text-7xl 3xl:text-6xl">{onHold.value}</div>
+        <div
+          className={`${
+            onHold.isComplete ? "bg-green-400" : "bg-[#F00B0F]"
+          } flex flex-col items-center px-5 3xl:py-10 py-5 rounded-lg gap-5 w-full`}
+        >
+          <div className="text-white font-bold text-3xl 3xl:text-6xl">
+            {onHold.name}
+          </div>
+          <div className="text-white font-bold text-7xl 3xl:text-6xl">
+            {onHold.value}
+          </div>
         </div>
         <div className="pt-3 flex flex-col 3xl:gap-3 gap-1">
           {tagLines.map((tagLine, idx) => (
