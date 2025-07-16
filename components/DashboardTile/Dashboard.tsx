@@ -29,6 +29,7 @@ const Dashboard = ({
             fill
             style={{ objectFit: "cover" }}
           />
+          <div className="text-white absolute -bottom-1">Last Updated : </div>
         </div>
       </div>
       <div className="grid grid-cols-3 3xl:gap-4 gap-1 w-6/12">

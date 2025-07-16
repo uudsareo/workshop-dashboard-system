@@ -3,7 +3,7 @@ import io, { Socket } from "socket.io-client";
 import { dispatch, useSelector } from "@/redux/store";
 import React, { useEffect, useRef, useState } from "react";
 
-import { Dashboard } from "../components/DashboardTile";
+import { Dashboard } from "../../../components/DashboardTile";
 
 import { DashboardTile } from "../constants/dashboard";
 import { getAllPart } from "@/redux/slices/dashboard";
@@ -41,10 +41,11 @@ const DashboardPage = () => {
   const [immediateNotification, setImmediateNotification] =
     useState<INotification | null>();
 
-  const currentDate = new Date();
-  const formattedDate = `${currentDate.getFullYear()}-${String(
-    currentDate.getMonth() + 1
-  ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
+  // const currentDate = new Date();
+
+  // const formattedDate = `${currentDate.getFullYear()}-${String(
+  //   currentDate.getMonth() + 1
+  // ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
 
   useEffect(() => {
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string);
@@ -55,14 +56,14 @@ const DashboardPage = () => {
 
     socket.on("DASHBOARD", (payload) => {
       if (payload.type === "UPDATE") {
-        dispatch(getAllPart(formattedDate));
+        dispatch(getAllPart(null));
       } else if (payload.type === "ADD") {
-        dispatch(getAllPart(formattedDate));
+        dispatch(getAllPart(null));
       } else if (payload.type === "DELETE") {
         console.log("Deleting part with ID:", payload.data._id);
-        dispatch(getAllPart(formattedDate));
+        dispatch(getAllPart(null));
       } else if (payload.type === "UNARCHIVE") {
-        dispatch(getAllPart(formattedDate));
+        dispatch(getAllPart(null));
       } else if (payload.type === "SETTINGS") {
         setSetting(payload.data);
       }
@@ -88,10 +89,7 @@ const DashboardPage = () => {
   }, []);
 
   useEffect(() => {
-    const formattedDate = `${currentDate.getFullYear()}-${String(
-      currentDate.getMonth() + 1
-    ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
-    dispatch(getAllPart(formattedDate));
+    dispatch(getAllPart(null));
     dispatch(getSettings());
   }, []);
 
@@ -207,9 +205,7 @@ const DashboardPage = () => {
           {Part.length > 0 &&
             Part[currentProject]?.projectId?.name +
               " - " +
-              new Date(Part[currentProject]?.parts[0]?.createdAt ?? "")
-                .toISOString()
-                .split("T")[0]}
+              new Date().toISOString().split("T")[0]}
         </h1>
       </div>
       <div

@@ -7,9 +7,9 @@ import * as Yup from "yup";
 import { dispatch, useSelector } from "@/redux/store";
 import { getPartById, updatePart } from "@/redux/slices/part";
 
-import FormProvider from "@/app/components/Form/hook-form/FormProvider";
-import InputText from "@/app/components/Form/hook-form/InputText";
-import SelectDropdown from "@/app/components/Form/hook-form/InputSelect";
+import FormProvider from "../../../../../components/Form/hook-form/FormProvider";
+import InputText from "../../../../../components/Form/hook-form/InputText";
+import SelectDropdown from "../../../../../components/Form/hook-form/InputSelect";
 import { XMarkIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
 import { project } from "@/interfaces/project";
 import { getProjects } from "@/redux/slices/project";

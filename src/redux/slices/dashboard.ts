@@ -53,10 +53,16 @@ export default slice.reducer;
 
 export const { setNotification, setPart } = slice.actions;
 
-export function getAllPart(date: string) {
+export function getAllPart(date: string | null) {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
+      // If date is null, fetch all parts
+      if (!date) {
+        const res = await Axios.get("/part");
+        dispatch(setPart(res.data.data));
+        return;
+      }
       const res = await Axios.get(`/part?date=${date}`);
       dispatch(setPart(res.data.data));
     } catch (error) {
