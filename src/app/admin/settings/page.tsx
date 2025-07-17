@@ -6,6 +6,7 @@ import { Button, TextField } from "@mui/material";
 
 import { dispatch, useSelector } from "@/redux/store";
 import { getSettings, updateSettings } from "@/redux/slices/setting";
+import Breadcrumb from "../../../../components/Breadcrumb/Breadcrumb";
 
 const SettingPage = () => {
   const settingsData = useSelector((state) => state.settings);
@@ -28,34 +29,53 @@ const SettingPage = () => {
     const res = await dispatch(updateSettings(duration, gridCount));
   };
 
+  const navData = [
+    {
+      title: "Dashboard",
+      href: "/admin",
+    },
+    {
+      title: "Settings",
+      href: "/admin/settings",
+      isHighlighted: true,
+    },
+  ];
+
   return (
-    <div className="bg-white min-h-screen">
-      <div className="p-5">
-        <TextField
-          required
-          type="number"
-          id="duration"
-          label="Duration"
-          value={duration}
-          onChange={(e) => setDuration(Number(e.target.value))}
-          variant="outlined"
-        />
-        <TextField
-          required
-          id="grid"
-          type="number"
-          label="Grid Count"
-          value={gridCount}
-          onChange={(e) => setGridCount(Number(e.target.value))}
-          variant="outlined"
-        />
-        <Button
-          onClick={() => {
-            onSubmit();
-          }}
-        >
-          Submit
-        </Button>
+    <div className="min-h-screen">
+      <div className="text-3xl font-bold pb-6 text-blue-900">Settings</div>
+      <Breadcrumb items={navData} />
+      <div className="pt-5 px-10 flex items-center gap-2">
+        <div className="text-lg"></div>
+      </div>
+      <div className="p-5 bg-white w-full h-full rounded-lg shadow-md">
+        <div className="p-5">
+          <TextField
+            required
+            type="number"
+            id="duration"
+            label="Duration"
+            value={duration}
+            onChange={(e) => setDuration(Number(e.target.value))}
+            variant="outlined"
+          />
+          <TextField
+            required
+            id="grid"
+            type="number"
+            label="Grid Count"
+            value={gridCount}
+            onChange={(e) => setGridCount(Number(e.target.value))}
+            variant="outlined"
+          />
+          <Button
+            onClick={() => {
+              onSubmit();
+            }}
+          >
+            Submit
+          </Button>
+        </div>
       </div>
     </div>
   );

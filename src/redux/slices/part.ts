@@ -74,6 +74,27 @@ export const {
 // Reducer
 export default slice.reducer;
 
+export function uploadImage(file: File) {
+  return async () => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await Axios.post("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      dispatch(slice.actions.setImageUrl(res.data.filePath));
+      return res;
+    } catch (error) {
+      dispatch(slice.actions.hasError(error));
+    }
+  };
+}
+
 export function insertPart(file: File, data: any) {
   return async () => {
     dispatch(slice.actions.startLoading());

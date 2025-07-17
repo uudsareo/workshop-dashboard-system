@@ -78,12 +78,12 @@ const ProjectPage = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const fetchProjects = async () => {
-  //     await dispatch(getProjects());
-  //   };
-  //   fetchProjects();
-  // }, []);
+  useEffect(() => {
+    const fetchProjects = async () => {
+      await dispatch(getProjects());
+    };
+    fetchProjects();
+  }, []);
 
   useEffect(() => {
     if (data) {

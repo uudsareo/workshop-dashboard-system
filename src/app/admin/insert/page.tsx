@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as Yup from "yup";
@@ -14,6 +14,9 @@ import { insertPart, resetPartData } from "@/redux/slices/part";
 import { ToastContainer, toast } from "react-toastify";
 import { locations, tagLines } from "@/app/constants/dashboard";
 import { Box, CircularProgress } from "@mui/material";
+import Breadcrumb from "../../../../components/Breadcrumb/Breadcrumb";
+import { PencilIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
 const Insert = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -141,9 +144,29 @@ const Insert = () => {
     dispatch(getProjects());
   }, []);
 
+  const navData = [
+    {
+      title: "Dashboard",
+      href: "/admin",
+    },
+    {
+      title: "Insert Part",
+      href: "/admin/insert",
+      isHighlighted: true,
+    },
+  ];
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
-    <div className="flex flex-col h-screen justify-center items-center overflow-auto bg-white">
-      <div className="w-full sm:w-[700px] border border-gray-50 p-3 rounded-lg shadow-md overflow-auto">
+    <div className="flex flex-col h-screen">
+      <div className="text-3xl font-bold pb-6 text-blue-900">Insert Part</div>
+      <Breadcrumb items={navData} />
+      <div className="w-full pt-10">
         <FormProvider
           className="space-y-6"
           methods={methods}
@@ -176,8 +199,40 @@ const Insert = () => {
               />
             )}
           </div>
-          <div className="">
-            <label
+          <div className="relative">
+            {file ? (
+              <Image
+                src={URL.createObjectURL(file ?? new Blob())}
+                alt="Part Image"
+                width={200}
+                height={250}
+                className="rounded-md"
+              />
+            ) : (
+              <div className="w-52 h-52  bg-gray-100 rounded-md flex items-center justify-center">
+                <span className="text-gray-500">No Image Selected</span>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleClick}
+              className="absolute top-2 left-2 text-black bg-white rounded-full p-1 hover:scale-105 hover:cursor-pointer"
+            >
+              <PencilIcon className="w-6 h-6" />
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setFile(file);
+                  }
+                }}
+              />
+            </button>
+            {/* <label
               className="block mb-2 text-sm font-medium text-black"
               htmlFor="file_input"
             >
@@ -199,7 +254,7 @@ const Insert = () => {
             />
             <p className="mt-1 text-sm" id="file_input_help">
               SVG, PNG, JPG or GIF (MAX. 800x400px).
-            </p>
+            </p> */}
             <div className="py-2">
               <div className="flex gap-2">
                 <div>Locations</div>
